@@ -38,11 +38,14 @@ export function incrementRunning(numbering: NumberingConfig, kind: string): Numb
 }
 
 async function captureElement(element: HTMLElement): Promise<HTMLCanvasElement> {
+  await document.fonts.ready;
   return html2canvas(element, {
     scale: 2,
     useCORS: true,
+    allowTaint: false,
     backgroundColor: '#ffffff',
     logging: false,
+    imageTimeout: 15000,
   });
 }
 

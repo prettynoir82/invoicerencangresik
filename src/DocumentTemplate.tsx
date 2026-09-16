@@ -1,12 +1,6 @@
 import { type Branding, type AnyDoc, type DocKind, type LineItem } from './types';
 import { money, itemAmount, docSubtotal, docTotal } from './lib';
 
-const DOC_LABELS: Record<DocKind, string> = {
-  invoice: 'INVOICE',
-  dp: 'DOWN PAYMENT',
-  refund: 'REFUND',
-};
-
 const NUMBER_LABELS: Record<DocKind, string> = {
   invoice: 'No. Invoice',
   dp: 'No. DP',
@@ -21,16 +15,19 @@ export function DocumentTemplate({ doc, branding }: { doc: AnyDoc; branding: Bra
   return (
     <article className="doc-paper" data-doc-paper>
       <div className="doc-grid">
-        <div className="doc-logo-area">
-          {branding.logo
-            ? <img src={branding.logo} alt="Logo" className="doc-logo-img" />
-            : <div className="doc-logo-placeholder"><span>RENCANG</span><b>RESIK</b></div>}
+        <div className="doc-top-row">
+          <div className="doc-logo-area">
+            {branding.logo
+              ? <img src={branding.logo} alt="Logo" className="doc-logo-img" />
+              : <div className="doc-logo-placeholder"><span>RENCANG</span><b>RESIK</b></div>}
+          </div>
+          <div className="doc-header-info">
+            <InfoRow label="Tanggal" value={doc.date} />
+            <InfoRow label="Nama Customer" value={doc.customer || '—'} />
+            <InfoRow label="Tempo" value={doc.tempo} />
+          </div>
         </div>
-        <div className="doc-header-info">
-          <InfoRow label="Tanggal" value={doc.date} />
-          <InfoRow label="Nama Customer" value={doc.customer || '—'} />
-          <InfoRow label="Tempo" value={doc.tempo} />
-        </div>
+
         <div className="doc-number-row">
           {NUMBER_LABELS[doc.kind]} : <strong>{doc.number}</strong>
         </div>
@@ -55,31 +52,38 @@ export function DocumentTemplate({ doc, branding }: { doc: AnyDoc; branding: Bra
         </table>
 
         <div className="doc-bottom-area">
-          <div className="doc-recipient">
-            <strong>Penerima</strong>
-            <span>(....................)</span>
+          <div className="doc-bottom-left">
+            <div className="doc-recipient">
+              <strong>Penerima</strong>
+              <span>(....................)</span>
+            </div>
           </div>
-          <div className="doc-totals">
-            <div><span>Sub total</span><strong>{money(subtotal)}</strong></div>
-            <div><span>Transportasi</span><strong>{money(doc.transport)}</strong></div>
-            <div className="doc-total-line"><span>Total biaya</span><strong>{money(total)}</strong></div>
+          <div className="doc-bottom-right">
+            <div className="doc-totals">
+              <div><span>Sub total</span><strong>{money(subtotal)}</strong></div>
+              <div><span>Transportasi</span><strong>{money(doc.transport)}</strong></div>
+              <div className="doc-total-line">
+                <span>Total biaya</span>
+                <strong className="doc-total-value">{money(total)}</strong>
+                {isPaid && <img src="/Tanda_lunas copy 2.png" alt="LUNAS" className="doc-paid-stamp-img" />}
+              </div>
+            </div>
           </div>
+        </div>
+
+        <div className="doc-sign-area">
+          <div className="doc-sign-spacer" />
           <div className="doc-signing">
             <span>Dengan hormat,</span>
-            {branding.signature
-              ? <img src={branding.signature} alt="Tanda tangan" className="doc-signature-img" />
-              : <div className="doc-signature-placeholder">Rencang Resik</div>}
-            <strong>({branding.company || 'Rencang Resik'})</strong>
+            <div className="doc-sign-stack">
+              <img src={branding.stamp || "/Stempel_rencang_resik.png"} alt="Stempel" className="doc-official-stamp" />
+              <img src="/Tandatangan-1.png" alt="Tanda tangan" className="doc-signature-img" />
+            </div>
+            <strong>(Rencang Resik)</strong>
           </div>
-          {branding.stamp
-            ? <img src={branding.stamp} alt="Stempel" className="doc-official-stamp" />
-            : <div className="doc-stamp-placeholder">STEMPEL<br />RENCANG RESIK</div>}
-          {isPaid && (branding.paidStamp
-            ? <img src={branding.paidStamp} alt="LUNAS" className="doc-paid-stamp-img" />
-            : <div className="doc-paid-stamp">LUNAS</div>)}
         </div>
-        <div className="doc-footer">"{branding.footer}"</div>
       </div>
+      <div className="doc-footer">"{branding.footer}"</div>
     </article>
   );
 }
